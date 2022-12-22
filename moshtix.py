@@ -32,8 +32,8 @@ def get_html():
     try:
         # 'https://www.moshtix.com.au/v2/venues/lazybones-lounge-restaurant-bar/7848'
         # 'https://www.moshtix.com.au/v2/venues/oxford-art-factory-sydney/867'
-        url = 'https://www.moshtix.com.au/v2/venues/lazybones-lounge-restaurant-bar/7848' # noqa
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"} # noqa
+        url = 'https://www.moshtix.com.au/v2/venues/lazybones-lounge-restaurant-bar/7848'  # noqa
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"}  # noqa
         r = requests.get(url, headers=headers, timeout=5)
     except requests.exceptions.HTTPError as err:
         print(err)
