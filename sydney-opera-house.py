@@ -62,7 +62,8 @@ def event_name(json: dict) -> str:
 
 def event_url(json: dict) -> str:
     '''Extracts & builds the event's url'''
-    return f"https://www.sydneyoperahouse.com{json['description'].get('ctaURL')}"
+    link = json['description'].get('ctaURL')
+    return f"https://www.sydneyoperahouse.com{link}"
 
 
 if __name__ == '__main__':
