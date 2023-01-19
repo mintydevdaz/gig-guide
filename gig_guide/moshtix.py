@@ -1,42 +1,53 @@
+import itertools
+from datetime import datetime
+from operator import itemgetter
+
 import bs4
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from moshtix_urls import urls
 
 
 def main():
-    # Requests HTML
-    request = get_html()
+    global urls
+    res = []
+    for venue, url in urls.items():
 
-    # Parse HTML
-    info = parse(r=request)
+        # Requests HTML
+        request = get_html(url)
 
-    # Event Dates
-    dates = event_dates(info[0])
+        # Parse HTML
+        info = parse(r=request)
 
-    # Band Names
-    bands = band_names(info[1])
+        # Retrieve date of each event
+        dates = event_dates(info[0])
 
-    # Event URLs
-    urls = event_urls(info[1])
+        # Convert dates to datetime format
+        format_dates = parse_dates(dates)
 
-    # Combine info together
-    event_data = combine(dates, bands, urls)
+        # Band Names
+        bands = band_names(info[1])
 
-    # Show table
-    # df = table(event_data)
+        # Event URLs
+        urls = event_urls(info[1])
+
+        # Combine info together
+        event_data = combine(format_dates, bands, urls, venue_name=venue)
+
+        # Add gigs to big list
+        res.extend(event_data)
+
+    # Sort by datetime
+    final_sort = sorted(res, key=itemgetter(0))
+    print(final_sort, sep='\n')
 
 
-def get_html():
-    # Get request from URL
+def get_html(url):
+    """Request HTML"""
     try:
-        # 'https://www.moshtix.com.au/v2/venues/lazybones-lounge-restaurant-bar/7848'
-        # 'https://www.moshtix.com.au/v2/venues/oxford-art-factory-sydney/867'
-        # 'https://moshtix.com.au/v2/venues/roundhouse-sydney/756'
-        # 'https://moshtix.com.au/v2/venues/big-top-luna-park-sydney/12'
-        # 'https://www.moshtix.com.au/v2/venues/the-lansdowne-hotel-sydney/4775'
-        url = 'https://www.moshtix.com.au/v2/venues/lazybones-lounge-restaurant-bar/7848'  # noqa
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"}  # noqa
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+        }
         r = requests.get(url, headers=headers, timeout=5)
     except requests.exceptions.HTTPError as err:
         print(err)
@@ -46,12 +57,12 @@ def get_html():
 
 
 def parse(r: requests.models.Response) -> tuple:
-    # Parse HTML
-    soup = BeautifulSoup(r.text, features='lxml')
+    """Parse HTML"""
+    soup = BeautifulSoup(r.text, features="lxml")
     # Gets event date
-    dates = soup.findAll('h2', class_='main-artist-event-header')
+    dates = soup.findAll("h2", class_="main-artist-event-header")
     # Gets event title & URL
-    events = soup.findAll('h2', class_='main-event-header')
+    events = soup.findAll("h2", class_="main-event-header")
     return dates, events
 
 
@@ -61,7 +72,17 @@ def event_dates(dates: bs4.element.ResultSet) -> list[str]:
     # Remove whitespace and line separators
     pass_two = [p.split() for p in pass_one]
     # List of cleaned dates
-    return [' '.join(p[:5]) for p in pass_two]
+    pass_three = [" ".join(p[1:4]) for p in pass_two]
+    return [i.replace(",", "") for i in pass_three]
+
+
+def parse_dates(dates: list[str]) -> list[datetime]:
+    """Convert dates into datetime format"""
+    res = []
+    for date in dates:
+        i = datetime.strptime(date, "%d %b %Y")
+        res.append(i)
+    return res
 
 
 def band_names(events: bs4.element.ResultSet) -> list[str]:
@@ -70,30 +91,24 @@ def band_names(events: bs4.element.ResultSet) -> list[str]:
     # Remove whitespace and line separators
     pass_two = [p.split() for p in pass_one]
     # List of bands
-    return [' '.join(p) for p in pass_two]
+    return [" ".join(p) for p in pass_two]
 
 
 def event_urls(events: bs4.element.ResultSet) -> list[str]:
     urls = []
     for event in events:
-        urls.extend(e['href'] for e in event.findAll('a'))
+        urls.extend(e["href"] for e in event.findAll("a"))
     return urls
 
 
-def combine(dates: list[str], bands: list[str], urls: list[str]) -> list:
+def combine(
+    dates: list[str], bands: list[str], urls: list[str], venue_name: str
+) -> list:
     if len(dates) == len(bands) == len(urls):
-        res = list(zip(dates, bands, urls))
-        print(*res, sep='\n')
-        return res
-    print(f"No. of Dates: {len(dates)}")
-    print(f"No. of Bands: {len(bands)}")
-    print(f"No. of URLs: {len(urls)}")
+        # Create list where venue is multiplied
+        venue_list = list(itertools.repeat(venue_name, len(dates)))
+        return list(zip(dates, bands, venue_list, urls))
 
 
-def table(event_data: list):
-    # print('Printing table...\n')
-    return pd.DataFrame(data=event_data, columns=['Date', 'Event', 'Link'])
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
