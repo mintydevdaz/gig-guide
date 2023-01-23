@@ -14,7 +14,7 @@ def main():
     df4 = century()
 
     # Combine DataFrames
-    res = pd.concat([df1, df2])
+    res = pd.concat([df1, df2, df3, df4])
 
     # Sort by datetime column then remove it
     res.sort_values(by="DT", inplace=True)
