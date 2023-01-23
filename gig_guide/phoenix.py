@@ -32,9 +32,6 @@ def main():
         dates.append(d)
         events.append(e)
 
-    # Intialise dictionary
-    data = {"DT": [], "Date": [], "Event": [], "Venue": [], "URL": []}
-
     # Parse date into datetime object. Re-format into string.
     dt = convert_datetime(dates)
     dt_dates = string_dates(dt)
@@ -42,7 +39,8 @@ def main():
     # Generate list with venue name
     venues = list(itertools.repeat("Phoenix Central Park", len(dates)))
 
-    # Update Dictionary
+    # Intialise & update dictionary
+    data = {"DT": [], "Date": [], "Event": [], "Venue": [], "URL": []}
     data["DT"] += dt
     data["Date"] += dt_dates
     data["Event"] += events
