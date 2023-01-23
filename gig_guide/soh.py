@@ -6,7 +6,8 @@ import pandas as pd
 import requests
 
 
-def main():
+def sydney_opera_house():
+    print('Retrieving Sydney Opera House event info')
     # Contruct unique url, get HTML response & parse JSON
     r = get_html_response(url=create_url())
     json = get_json(response=r)
@@ -35,9 +36,7 @@ def main():
     data["Venue"] += venues
     data["URL"] += urls
 
-    # Create DataFrame
-    df = table(data)
-    write_csv(df)
+    return table(data)
 
 
 def create_url() -> str:
@@ -107,14 +106,6 @@ def table(dict_data: dict) -> pd.DataFrame:
     return pd.DataFrame(dict_data)
 
 
-# !! DELETE
-def write_csv(df):
-    now = datetime.now()
-    dt_string = now.strftime("%Y-%m-%d_%H%M%S")
-    filepath = f"/Users/darrenchung/Desktop/sydney-opera-house-gigs_{dt_string}.csv"
-    print(f"CSV file saved at {filepath}")
-    return df.to_csv(filepath, index=False)
-
-
 if __name__ == "__main__":
-    main()
+    sydney_opera_house()
+

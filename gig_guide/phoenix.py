@@ -10,7 +10,8 @@ from bs4 import BeautifulSoup
 from database import phoenix_link
 
 
-def main():
+def phoenix():
+    print('Retrieving Phoenix Central Park event info')
     # Get HTML response & parse. Extract invidiual event URLs.
     link = phoenix_link.get("Phoenix Central Park")
     r = get_html_response(url=link)
@@ -45,9 +46,7 @@ def main():
     data["Venue"] += venues
     data["URL"] += urls
 
-    # Create DataFrame
-    df = table(data)
-    write_csv(df)
+    return table(data)
 
 
 def get_html_response(url: str) -> requests.models.Response:
@@ -108,14 +107,6 @@ def table(dict_data: dict) -> pd.DataFrame:
     return pd.DataFrame(dict_data)
 
 
-# !! DELETE
-def write_csv(df):
-    now = datetime.now()
-    dt_string = now.strftime("%Y-%m-%d_%H%M%S")
-    filepath = f"/Users/darrenchung/Desktop/phoenix-gigs_{dt_string}.csv"
-    print(f"CSV file saved at {filepath}")
-    return df.to_csv(filepath, index=False)
-
-
 if __name__ == "__main__":
-    main()
+    phoenix()
+

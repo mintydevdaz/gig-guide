@@ -8,13 +8,14 @@ from bs4 import BeautifulSoup
 from database import century_links
 
 
-def main():
+def century():
     dates = []
     events = []
     venues = []
     urls = []
 
     for venue, url in century_links.items():
+        print(f'Retrieving {venue} event info')
 
         # Get HTML response & parse. Access HTML IDs.
         r = get_html_response(url)
@@ -47,9 +48,7 @@ def main():
         "URL": urls
     }
 
-    # Create DataFrame
-    df = table(data)
-    write_csv(df)
+    return table(data)
 
 
 def get_html_response(url: str) -> requests.models.Response:
@@ -111,14 +110,6 @@ def table(dict_data: dict) -> pd.DataFrame:
     return pd.DataFrame(dict_data)
 
 
-# !! DELETE
-def write_csv(df):
-    now = datetime.now()
-    dt_string = now.strftime("%Y-%m-%d_%H%M%S")
-    filepath = f"/Users/darrenchung/Desktop/century-gigs_{dt_string}.csv"
-    print(f"CSV file saved at {filepath}")
-    return df.to_csv(filepath, index=False)
-
-
 if __name__ == "__main__":
-    main()
+    century()
+
