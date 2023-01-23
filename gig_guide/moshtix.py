@@ -10,6 +10,7 @@ from database import moshtix_links
 
 
 def main():
+    print('Retrieiving Moshtix event information')
     data = {"DT": [], "Date": [], "Event": [], "Venue": [], "URL": []}
     for venue, url in moshtix_links.items():
 
