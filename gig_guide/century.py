@@ -15,7 +15,7 @@ def century():
     urls = []
 
     for venue, url in century_links.items():
-        print(f'Retrieving {venue} event info')
+        print(f'Retrieving data from {venue} website')
 
         # Get HTML response & parse. Access HTML IDs.
         r = get_html_response(url)

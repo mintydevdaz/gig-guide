@@ -10,10 +10,9 @@ from database import moshtix_links
 
 
 def moshtix():
-    print('Retrieving Moshtix event info')
     data = {"DT": [], "Date": [], "Event": [], "Venue": [], "URL": []}
     for venue, url in moshtix_links.items():
-
+        print(f'Retrieving data from {venue} website')
         # Get HTML response & parse
         r = get_html_response(url)
         soup = parse_html(response=r)

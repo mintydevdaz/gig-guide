@@ -7,7 +7,7 @@ import requests
 
 
 def sydney_opera_house():
-    print('Retrieving Sydney Opera House event info')
+    print('Retrieving data from Sydney Opera House website')
     # Contruct unique url, get HTML response & parse JSON
     r = get_html_response(url=create_url())
     json = get_json(response=r)

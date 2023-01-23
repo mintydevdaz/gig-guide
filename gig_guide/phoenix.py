@@ -11,7 +11,7 @@ from database import phoenix_link
 
 
 def phoenix():
-    print('Retrieving Phoenix Central Park event info')
+    print('Retrieving data from Phoenix Central Park website')
     # Get HTML response & parse. Extract invidiual event URLs.
     link = phoenix_link.get("Phoenix Central Park")
     r = get_html_response(url=link)
