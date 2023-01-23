@@ -10,20 +10,20 @@ from database import moshtix_links
 
 
 def main():
-    print('Retrieiving Moshtix event information')
+    print('Retrieving Moshtix event information')
     data = {"DT": [], "Date": [], "Event": [], "Venue": [], "URL": []}
     for venue, url in moshtix_links.items():
 
-        # Get HTML response and parse
+        # Get HTML response & parse
         r = get_html_response(url)
         soup = parse_html(response=r)
 
-        # Retrieve event date, event title and url
+        # Retrieve event date, title, & url
         dates = event_dates(soup[0])
         events = event_title(soup[1])
         urls = event_urls(soup[1])
 
-        # Parse date into datetime object. Format into string.
+        # Parse date into datetime object. Re-format into string.
         dt = convert_datetime(dates)
         dt_dates = string_dates(dt)
 
@@ -86,7 +86,7 @@ def convert_datetime(dates: list[str]) -> list[datetime]:
 
 
 def string_dates(dt_objects: list[datetime]) -> list[str]:
-    """Converts datetime object into date strings"""
+    """Format datetime objects into dd-mmm-yy format"""
     res = []
     for dt in dt_objects:
         i = dt.strftime("%d-%b-%-y (%a)")
@@ -118,7 +118,7 @@ def table(dict_data: dict) -> pd.DataFrame:
 def write_csv(df):
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d_%H%M%S")
-    filepath = f"/Users/darrenchung/Desktop/gigs_{dt_string}.csv"
+    filepath = f"/Users/darrenchung/Desktop/moshtix-gigs_{dt_string}.csv"
     print(f"CSV file saved at {filepath}")
     return df.to_csv(filepath, index=False)
 
