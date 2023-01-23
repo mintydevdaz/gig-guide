@@ -39,12 +39,13 @@ def main():
     dt_dates = string_dates(dt)
 
     # Intialise & update dictionary
-    data = {"DT": [], "Date": [], "Event": [], "Venue": [], "URL": []}
-    data["DT"] += dt
-    data["Date"] += dt_dates
-    data["Event"] += events
-    data["Venue"] += venues
-    data["URL"] += urls
+    data = {
+        "DT": dt,
+        "Date": dt_dates,
+        "Event": events,
+        "Venue": venues,
+        "URL": urls
+    }
 
     # Create DataFrame
     df = table(data)
