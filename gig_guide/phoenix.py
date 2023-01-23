@@ -27,10 +27,8 @@ def main():
         soup = parse_html(response=r)
 
         # Get headline act & date
-        d = event_date(soup)
-        e = event_name(soup)
-        dates.append(d)
-        events.append(e)
+        dates.append(event_date(soup))
+        events.append(event_name(soup))
 
     # Parse date into datetime object. Re-format into string.
     dt = convert_datetime(dates)
