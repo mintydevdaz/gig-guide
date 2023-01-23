@@ -1,82 +1,72 @@
 import itertools
+import sys
 from datetime import datetime
-from operator import itemgetter
 
 import bs4
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from moshtix_urls import links
+from database import moshtix_links
 
 
 def main():
-    res = []
-    for venue, url in links.items():
+    data = {"DT": [], "Date": [], "Event": [], "Venue": [], "URL": []}
+    for venue, url in moshtix_links.items():
 
-        # Requests HTML
-        response = get_response(url)
+        # Get HTML response and parse
+        r = get_html_response(url)
+        soup = parse_html(response=r)
 
-        # Parse HTML
-        info = parse(r=response)
+        # Retrieve event date, event title and url
+        dates = event_dates(soup[0])
+        events = event_title(soup[1])
+        urls = event_urls(soup[1])
 
-        # Retrieve date of each event
-        dates = event_dates(info[0])
-        # Convert dates to datetime format
-        format_dates = parse_dates(dates)
-        # List of dates as string objects
-        str_dates = string_dates(format_dates)
-        # List of weekdays as string objects
-        str_days = string_days(format_dates)
+        # Parse date into datetime object. Format into string.
+        dt = convert_datetime(dates)
+        dt_dates = string_dates(dt)
 
-        # Band Names
-        bands = band_names(info[1])
+        # Create venue list
+        venues = list(itertools.repeat(venue, len(dates)))
 
-        # Event URLs
-        urls = event_urls(info[1])
+        # Update Dictionary
+        data["DT"] += dt
+        data["Date"] += dt_dates
+        data["Event"] += events
+        data["Venue"] += venues
+        data["URL"] += urls
 
-        # Combine info together
-        event_data = combine(
-            format_dates, str_dates, str_days, bands, urls, venue_name=venue
-        )
-
-        # Add gigs to big list
-        res.extend(event_data)
-
-    # Sort by datetime
-    final_sort = sorted(res, key=itemgetter(0))
-
-    # Construct table and remove first column
-    df = table(gigs=final_sort)
-    df2 = remove_col(df)
-
-    # Save CSV file
-    write_csv(df2)
+    # Create DataFrame
+    df = table(data)
+    write_csv(df)
 
 
-def get_response(url):
-    '''Get HTML response'''
+def get_html_response(url: str) -> requests.models.Response:
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"} # noqa
-        response = requests.get(url, headers, timeout=5)
-        response.raise_for_status()
-        return response
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+        }
+        r = requests.get(url, headers=headers, timeout=5)
+        r.raise_for_status()
     except requests.exceptions.HTTPError as http_err:
-        print(f'HTTP error occurred: {http_err}')
+        sys.exit(f"HTTP error occurred: \n'{http_err}'")
+    except requests.exceptions.Timeout as timeout_err:
+        sys.exit(f"Timeout error occurred: \n'{timeout_err}'")
     except Exception as err:
-        print(f'Other error occurred: {err}')
+        sys.exit(f"Error occurred: \n'{err}'")
+    return r
 
 
-def parse(r: requests.models.Response) -> tuple:
-    """Parse HTML"""
-    soup = BeautifulSoup(r.text, features="lxml")
-    # Gets event date
+def parse_html(response: requests.models.Response) -> tuple:
+    """Extracts the raw dates and events from the website"""
+    soup = BeautifulSoup(response.text, features="lxml")
     dates = soup.findAll("h2", class_="main-artist-event-header")
-    # Gets event title & URL
     events = soup.findAll("h2", class_="main-event-header")
     return dates, events
 
 
 def event_dates(dates: bs4.element.ResultSet) -> list[str]:
+    """Prepares dates for parsing into a datetime object"""
     # Get text from HTML
     pass_one = [date.text for date in dates]
     # Remove whitespace and line separators
@@ -86,8 +76,7 @@ def event_dates(dates: bs4.element.ResultSet) -> list[str]:
     return [i.replace(",", "") for i in pass_three]
 
 
-def parse_dates(dates: list[str]) -> list[datetime]:
-    """Convert dates into datetime format"""
+def convert_datetime(dates: list[str]) -> list[datetime]:
     res = []
     for date in dates:
         i = datetime.strptime(date, "%d %b %Y")
@@ -99,21 +88,12 @@ def string_dates(dt_objects: list[datetime]) -> list[str]:
     """Converts datetime object into date strings"""
     res = []
     for dt in dt_objects:
-        i = dt.strftime("%d-%b-%-y")
+        i = dt.strftime("%d-%b-%-y (%a)")
         res.append(i)
     return res
 
 
-def string_days(dt_objects: list[datetime]) -> list[str]:
-    """Converts datetime object into weekday"""
-    res = []
-    for dt in dt_objects:
-        i = dt.strftime("%a")
-        res.append(i)
-    return res
-
-
-def band_names(events: bs4.element.ResultSet) -> list[str]:
+def event_title(events: bs4.element.ResultSet) -> list[str]:
     # Get text from HTML
     pass_one = [e.text for e in events]
     # Remove whitespace and line separators
@@ -129,33 +109,11 @@ def event_urls(events: bs4.element.ResultSet) -> list[str]:
     return urls
 
 
-def combine(
-    dates: list[datetime],
-    string_dates: list[str],
-    string_days: list[str],
-    bands: list[str],
-    urls: list[str],
-    venue_name: str,
-) -> list:
-    if len(dates) == len(bands) == len(urls):
-        # Create list where venue is multiplied
-        venue_list = list(itertools.repeat(venue_name, len(dates)))
-        return list(
-            zip(dates, string_dates, string_days, bands, venue_list, urls)
-        )  # noqa
+def table(dict_data: dict) -> pd.DataFrame:
+    return pd.DataFrame(dict_data)
 
 
-def table(gigs: list) -> pd.DataFrame:
-    """Table of gigs"""
-    return pd.DataFrame(
-        gigs, columns=["dt", "Date", "Weekday", "Event", "Venue", "Link"]
-    )
-
-
-def remove_col(df):
-    return df.drop('dt', axis='columns')
-
-
+# !! DELETE
 def write_csv(df):
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d_%H%M%S")
