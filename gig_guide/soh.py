@@ -7,7 +7,7 @@ import requests
 
 
 def sydney_opera_house():
-    print('Retrieving data from Sydney Opera House website')
+    print("Retrieving data from Sydney Opera House website")
     # Contruct unique url, get HTML response & parse JSON
     r = get_html_response(url=create_url())
     json = get_json(response=r)
@@ -108,4 +108,3 @@ def table(dict_data: dict) -> pd.DataFrame:
 
 if __name__ == "__main__":
     sydney_opera_house()
-
