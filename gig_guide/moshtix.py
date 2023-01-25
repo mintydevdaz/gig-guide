@@ -77,7 +77,7 @@ def event_dates(dates: bs4.element.ResultSet) -> list[str]:
 def convert_datetime(dates: list[str]) -> list[datetime]:
     res = []
     for date in dates:
-        i = datetime.strptime(date, "%d %b %Y")
+        i = datetime.strptime(date, "%d %b %Y").date()
         res.append(i)
     return res
 

@@ -88,7 +88,7 @@ def event_url(json: dict) -> str:
 def convert_datetime(dates: list[str]) -> list[datetime]:
     res = []
     for d in dates:
-        i = datetime.strptime(d, "%Y-%m-%d")
+        i = datetime.strptime(d, "%Y-%m-%d").date()
         res.append(i)
     return res
 

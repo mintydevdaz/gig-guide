@@ -89,7 +89,7 @@ def event_name(soup: bs4.BeautifulSoup) -> str:
 def convert_datetime(dates: list[str]) -> list[datetime]:
     dt_objects = []
     for d in dates:
-        i = datetime.strptime(d, "%d %B %Y")
+        i = datetime.strptime(d, "%d %B %Y").date()
         dt_objects.append(i)
     return dt_objects
 
