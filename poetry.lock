@@ -352,6 +352,21 @@ docs = ["furo (>=2022.12.7)", "proselint (>=0.13)", "sphinx (>=5.3)", "sphinx-au
 test = ["appdirs (==1.4.4)", "covdefaults (>=2.2.2)", "pytest (>=7.2)", "pytest-cov (>=4)", "pytest-mock (>=3.10)"]
 
 [[package]]
+name = "pretty-html-table"
+version = "0.9.16"
+description = "Make pandas dataframe looking pretty again"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pretty_html_table-0.9.16-py3-none-any.whl", hash = "sha256:095e1ac72da0561905a904f23e6116a2072f943388087205ae1c3524902bb3b4"},
+    {file = "pretty_html_table-0.9.16.tar.gz", hash = "sha256:c0de765ca9fd59cafc6912425eff3a4eff34607b96dddf9edf419718b77f9ae3"},
+]
+
+[package.dependencies]
+pandas = "*"
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -444,4 +459,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "dd26d2bd0436906d469cabe29b3e0588318d1222250233415cfbce41f980b4f7"
+content-hash = "047b33de29c0aaaa669223e6ae9ff6b31a2fc4b1a77b01edb0161a2ea2b0daaf"
