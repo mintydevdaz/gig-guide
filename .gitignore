@@ -162,4 +162,3 @@ cython_debug/
 # Mac & VSCode
 .DS_Store
 gigs.code-workspace
-.vscode
