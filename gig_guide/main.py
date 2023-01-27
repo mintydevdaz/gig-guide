@@ -1,35 +1,23 @@
-from datetime import date, datetime, timedelta
-
 import pandas as pd
-from century import century
-from moshtix import moshtix
-from phoenix import phoenix
+from compile_tables import compile_tables
 from pretty_html_table import build_table
-from soh import sydney_opera_house
+from message import message
+from datetime import date, datetime, timedelta
 
 
 def main():
-    df1 = moshtix()
-    df2 = sydney_opera_house()
-    # df3 = phoenix()
-    # df4 = century()
+    # Gather gig data into table
+    df = compile_tables()
 
-    # Combine DataFrames
-    df = pd.concat([df1, df2])
-    # df = pd.concat([df1, df2, df3, df4])
-
-    # Sort by datetime column
-    df.sort_values(by="DT", inplace=True)
+    # Create CSV file on Desktop
+    final_table = remove_col(df)
+    path = write_csv(final_table)
 
     # Create HTML table
     html_table = email_table(mini_table(df))
 
-    # Create CSV file on Desktop
-    final_table = remove_col(df)
-    csv_path = write_csv(final_table)
-
-    # TODO - prepare emails to guest list
-    # TODO - optimise phoenix.py
+    # Send email
+    message(html_table, csv_file=path)
 
 
 def write_csv(df: pd.DataFrame) -> str:
@@ -43,7 +31,7 @@ def write_csv(df: pd.DataFrame) -> str:
 
 def mini_table(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Prepare table for conversion in pretty_html_table.
+    Prepare table for conversion into pretty_html_table.
     Shows gigs within a 30-day timeframe from today.
     Alse removes the 'DT' column (first column).
     """
@@ -55,6 +43,9 @@ def mini_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def email_table(table: pd.DataFrame) -> str:
+    """
+    Format pretty_html_table
+    """
     return build_table(
         table,
         "blue_dark",
