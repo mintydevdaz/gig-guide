@@ -29,13 +29,16 @@ def main():
     content = attachment(path)
 
     # Login to Gmail Account
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+    SERVER_ADDRESS = 'smtp.gmail.com'
+    TLS_PORT = 587
+    with smtplib.SMTP(SERVER_ADDRESS, TLS_PORT) as server:
+        server.starttls()
         server.login(SENDER, PASSWORD)
 
         # Cycle through list of receiving email addresses
         for name, receiver in receivers.items():
 
-            # Prepare email body in plain text & html
+            # Prepare email body (plain text & html)
             plain_text = body(name)
             html_body = get_html_body(name, html_table)
 
