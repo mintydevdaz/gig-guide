@@ -38,10 +38,10 @@ def master_df() -> pd.DataFrame:
     """Compiles all gig data into pd.DataFrames"""
     df1 = moshtix()
     df2 = sydney_opera_house()
-    # df3 = phoenix()
-    # df4 = century()
-    main_df = pd.concat([df1, df2])
-    # main_df = pd.concat([df1, df2, df3, df4])
+    df3 = phoenix()
+    df4 = century()
+    # main_df = pd.concat([df1, df2])
+    main_df = pd.concat([df1, df2, df3, df4])
     main_df.sort_values(by="DT", inplace=True)
     return main_df
 
