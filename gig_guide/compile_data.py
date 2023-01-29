@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from pathlib import Path
 
 import pandas as pd
 from century import century
@@ -16,7 +17,7 @@ def master_file():
 
 
 def email_file(df: pd.DataFrame):
-    """Create the email attachment as aCSV file"""
+    """Create the email attachment as a CSV file"""
     small_table = thirty_days_table(df)
     rm_col = remove_col(small_table)
     write_csv(rm_col, filename="email")
@@ -24,7 +25,8 @@ def email_file(df: pd.DataFrame):
 
 def body_table() -> str:
     """Create pretty_html_table for Master CSV file"""
-    df = pd.read_csv("/Users/darrenchung/Desktop/gigs_email.csv")
+    parent_dir = str(Path.home() / "Desktop")
+    df = pd.read_csv(f"{parent_dir}/gigs_email.csv")
     return build_table(
         df,
         "blue_dark",
@@ -60,7 +62,8 @@ def thirty_days_table(df: pd.DataFrame) -> pd.DataFrame:
 
 def write_csv(df: pd.DataFrame, filename: str):
     """Writes DataFrame to CSV"""
-    f = f"/Users/darrenchung/Desktop/gigs_{filename}.csv"
+    parent_dir = str(Path.home() / "Desktop")
+    f = f"{parent_dir}/gigs_{filename}.csv"
     print(f"Saved CSV -> {f}")
     return df.to_csv(f, index=False)
 
