@@ -61,8 +61,9 @@ def get_html_body(name: str, html_table: str) -> str:
             <html>
                 <body>
                     <p>Dear {name},</p>
-                    <p>Attached is the current list of gigs for the next 30
-                    days at the following venues:</p>
+                    <p>Below is the current list of gigs for the next 30
+                    days at the following venues.
+                    Attached is a more comprehensive list.</p>
                         <ul>
                             <li>Big Top Luna Park</li>
                             <li>Enmore Theatre</li>
