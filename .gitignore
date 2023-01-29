@@ -162,4 +162,4 @@ cython_debug/
 # My Files
 .DS_Store
 gigs.code-workspace
-gig_guide/message.py
+gig_guide/email_list.py
