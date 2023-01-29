@@ -1,6 +1,9 @@
+from email.message import EmailMessage
+
+
 def attachment(csv_file: str) -> bytes:
     """Prepare CSV attachment for email(s)"""
-    with open(csv_file, 'rb') as content_file:
+    with open(csv_file, "rb") as content_file:
         return content_file.read()
 
 
@@ -24,9 +27,32 @@ def body(name: str) -> str:
             - The Concourse
             - UNSW Roundhouse
 
+            You might find more gigs here:
+            - https://sydneymusic.net
+            - https://www.ticketmaster.com.au
+            - http://m.ticketek.com.au
+
             Kind regards,
             Darren "Cool D" Chung
             """
+
+
+def create_email_message(
+    from_address: str, to_address: str, body: str, html_body: str, attachment: bytes, csv_path: str
+) -> EmailMessage:
+    msg = EmailMessage()
+    msg["From"] = from_address
+    msg["To"] = to_address
+    msg["Subject"] = "Upcoming Gigs"
+    msg.set_content(body)
+    msg.set_content(html_body, subtype="html")
+    msg.add_attachment(
+        attachment,
+        maintype="application",
+        subtype="csv",
+        filename=f"{csv_path}"
+    )
+    return msg
 
 
 def get_html_body(name: str, html_table: str) -> str:
@@ -37,20 +63,26 @@ def get_html_body(name: str, html_table: str) -> str:
                     <p>Dear {name},</p>
                     <p>Attached is the current list of gigs for the next 30
                     days at the following venues:</p>
-                    <ul>
-                        <li>Big Top Luna Park</li>
-                        <li>Enmore Theatre</li>
-                        <li>Factory Theatre</li>
-                        <li>Lansdowne Hotel</li>
-                        <li>Lazybones Lounge</li>
-                        <li>Manning Bar</li>
-                        <li>Metro Theatre</li>
-                        <li>Oxford Factory Theatre</li>
-                        <li>Phoenix Central Park</li>
-                        <li>Sydney Opera House</li>
-                        <li>The Councourse</li>
-                        <li>UNSW Roundhouse</li>
-                    </ul>
+                        <ul>
+                            <li>Big Top Luna Park</li>
+                            <li>Enmore Theatre</li>
+                            <li>Factory Theatre</li>
+                            <li>Lansdowne Hotel</li>
+                            <li>Lazybones Lounge</li>
+                            <li>Manning Bar</li>
+                            <li>Metro Theatre</li>
+                            <li>Oxford Factory Theatre</li>
+                            <li>Phoenix Central Park</li>
+                            <li>Sydney Opera House</li>
+                            <li>The Councourse</li>
+                            <li>UNSW Roundhouse</li>
+                        </ul>
+                    <p>You might find more gigs here:</p>
+                        <ul>
+                            <li><a href="https://sydneymusic.net">Sydney Music</a></li>
+                            <li><a href="https://www.ticketmaster.com.au/browse/all-music-catid-10001/music-rid-10001">Ticketmaster</a></li>
+                            <li><a href="https://premier.ticketek.com.au/shows/genre.aspx?c=2048">Ticketek</a></li>
+                        </ul>
                     {html_table}
                     <p>Kind regards,
                     <br>Darren "Cool D" Chung<p>

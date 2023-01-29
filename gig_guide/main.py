@@ -1,8 +1,11 @@
+import os
+from datetime import date, datetime, timedelta
+
 import pandas as pd
 from compile_tables import compile_tables
-from pretty_html_table import build_table
+from dotenv import load_dotenv
 from message import message
-from datetime import date, datetime, timedelta
+from pretty_html_table import build_table
 
 
 def main():
@@ -10,14 +13,24 @@ def main():
     df = compile_tables()
 
     # Create CSV file on Desktop
-    final_table = remove_col(df)
-    path = write_csv(final_table)
+    table = remove_col(df)
+    path = write_csv(table)
 
     # Create HTML table
     html_table = email_table(mini_table(df))
 
+    # Load environment vars
+    env = load_dotenv(dotenv_path=os.path.basename("gig_guide/.env"))
+    SENDER = os.getenv("SENDER")
+    PASSWORD = os.getenv("PASSWORD")
+
     # Send email
-    message(html_table, csv_file=path)
+    message(
+        html_table=html_table,
+        csv_file=path,
+        user_email=SENDER,
+        user_password=PASSWORD
+    )
 
 
 def write_csv(df: pd.DataFrame) -> str:

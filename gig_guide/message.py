@@ -1,29 +1,18 @@
-import os
 import smtplib
-from datetime import date, datetime
-from email.message import EmailMessage
 
-from dotenv import load_dotenv
-from email_funcs import attachment, body, get_html_body
+from email_funcs import attachment, body, create_email_message, get_html_body
 from email_list import receivers
 
-# TODO: add in links to SydneyMusic, Ticketek, Ticketmaster
 
-
-def message(html_table: str, csv_file: str):
-    # Load environmental variables
-    x = load_dotenv(dotenv_path=os.path.basename('gig_guide/.env'))
-    SENDER = os.getenv('SENDER')
-    PASSWORD = os.getenv('PASSWORD')
+def message(
+    html_table: str, csv_file: str, user_email: str, user_password: str
+):
 
     # Prepare file attachment
     content = attachment(csv_file)
 
-    # !! unique day (CONSIDER DELETION)
-    day = today()
-
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(user=SENDER, password=PASSWORD)
+        server.login(user=user_email, password=user_password)
 
         # Send to each person in dict
         for name, receiver in receivers.items():
@@ -33,24 +22,18 @@ def message(html_table: str, csv_file: str):
             plain_text = body(name)
             html_body = get_html_body(name, html_table)
 
-            # Instantiate email func
-            msg = EmailMessage()
-            msg["From"] = SENDER
-            msg["To"] = receiver
-            msg["Subject"] = "Upcoming Gigs"
-            msg.set_content(plain_text)
-            msg.add_alternative(html_body, subtype="html")
-            msg.add_attachment(content,
-                               maintype="application",
-                               subtype="csv",
-                               filename=f"gigs_{day}.csv")
+            # Instantiate email
+            msg = create_email_message(
+                from_address=user_email,
+                to_address=receiver,
+                body=plain_text,
+                html_body=html_body,
+                attachment=content,
+                csv_path=csv_file
+            )
 
             server.send_message(msg)
             print("-> Email Sent")
-
-
-def today() -> str():
-    return datetime.strftime(date.today(), "%d-%b-%-y")
 
 
 if __name__ == "__main__":
