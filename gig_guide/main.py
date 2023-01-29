@@ -1,5 +1,6 @@
 import os
 import smtplib
+from pathlib import Path
 
 from compile_data import body_table, email_file, master_file
 from dotenv import load_dotenv
@@ -22,8 +23,9 @@ def main():
     SENDER = os.getenv("SENDER")
     PASSWORD = os.getenv("PASSWORD")
 
-    # Prepare file attachment
-    path = "/Users/darrenchung/Desktop/gigs_email.csv"
+    # Get Desktop path. Prepare file attachment.
+    parent_dir = str(Path.home() / "Desktop")
+    path = f"{parent_dir}/gigs_email.csv"
     content = attachment(path)
 
     # Login to Gmail Account
@@ -34,7 +36,6 @@ def main():
         for name, receiver in receivers.items():
 
             # Prepare email body in plain text & html
-            print(f"Preparing email for {name} ({receiver})")
             plain_text = body(name)
             html_body = get_html_body(name, html_table)
 
@@ -45,11 +46,15 @@ def main():
                 body=plain_text,
                 html_body=html_body,
                 attachment=content,
-                csv_path=path
+                csv_path="gigs.csv"
             )
             server.send_message(msg)
-            print("-> Email Sent")
+            print(f"-> Email sent to {name} ({receiver})")
 
+    # Delete Master CSV & gigs_email CSV
+    os.remove(f"{parent_dir}/gigs_master.csv")
+    os.remove(path)
+    print(f"Removed files from {parent_dir}")
 
 if __name__ == "__main__":
     main()
