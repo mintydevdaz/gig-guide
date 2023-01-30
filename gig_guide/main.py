@@ -29,7 +29,7 @@ def main():
     content = attachment(path)
 
     # Login to Gmail Account
-    SERVER_ADDRESS = 'smtp.gmail.com'
+    SERVER_ADDRESS = "smtp.gmail.com"
     TLS_PORT = 587
     with smtplib.SMTP(SERVER_ADDRESS, TLS_PORT) as server:
         server.starttls()
@@ -49,7 +49,7 @@ def main():
                 body=plain_text,
                 html_body=html_body,
                 attachment=content,
-                csv_path="gigs.csv"
+                csv_path="gigs.csv",
             )
             server.send_message(msg)
             print(f"-> Email sent to {name} ({receiver})")
@@ -58,6 +58,7 @@ def main():
     os.remove(f"{parent_dir}/gigs_master.csv")
     os.remove(path)
     print(f"Removed files from {parent_dir}")
+
 
 if __name__ == "__main__":
     main()
